@@ -1,0 +1,64 @@
+﻿-------------------------ProductContext--------------------------
+
+Enable-Migrations -ContextTypeName ProductContext -MigrationsDirectory Migrations\Product
+
+add-migration -ConfigurationTypeName  MobilePhoneListing.Migrations.Product.Configuration "InitialCreate"
+
+update-database -ConfigurationTypeName  MobilePhoneListing.Migrations.Product.Configuration
+
+
+-----------------------------ApplicationDbContext-------------------------------------------
+
+Enable-Migrations -ContextTypeName ApplicationDbContext -MigrationsDirectory Migrations\Identity
+
+add-migration -ConfigurationTypeName  MobilePhoneListing.Migrations.Identity.Configuration "InitialIdentity"
+update-database -ConfigurationTypeName   MobilePhoneListing.Migrations.Identity.Configuration
+
+
+-------------------------------seed data---------------------------------------------
+ protected override void Seed(ApplicationDbContext context)
+        {
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+            if (!roleManager.RoleExists("Admin"))
+                roleManager.Create(new IdentityRole("Admin"));
+
+            if (!roleManager.RoleExists("Guest"))
+                roleManager.Create(new IdentityRole("Guest"));
+
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+            if (userManager.FindByEmail("admin@mobilelisting.com") == null)
+            {
+                var user = new ApplicationUser
+                {
+                    Email = "admin@mobilelisting.com",
+                    UserName = "admin@mobilelisting.com",
+                };
+                var result = userManager.Create(user, "admin_123");
+                if (result.Succeeded)
+                    userManager.AddToRole(userManager.FindByEmail(user.Email).Id, "Admin");
+            }
+
+            if (userManager.FindByEmail("guest@mobilelisting.com") == null)
+            {
+                var user = new ApplicationUser
+                {
+                    Email = "guest@mobilelisting.com",
+                    UserName = "guest@mobilelisting.com",
+                };
+                var result = userManager.Create(user, "guest_123");
+                if (result.Succeeded)
+                    userManager.AddToRole(userManager.FindByEmail(user.Email).Id, "Guest");
+            }
+        }
+
+
+         protected override void Seed(MobilePhoneListing.Data.ProductContext context)
+        {
+            //  This method will be called after migrating to the latest version.
+
+            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
+            //  to avoid creating duplicate seed data.
+
+            context.Products.AddOrUpdate(
+               p => new { p.ProductName, p.ShortDescription, p.LongDescription, p.Specification,p.ImagePath,p.Price }, DummyData.getProducts().ToArray());
+        }

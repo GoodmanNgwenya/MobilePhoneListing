@@ -1,0 +1,50 @@
+﻿@model MobilePhoneListing.Models.Product
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Product</h4>
+    <hr />
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="@Url.Content(Model.ImagePath)" width="400" height="400" />
+            </div>
+            <div class="col-sm-6">
+                <div class="card-body">
+                    <h4 class="card-title">@Html.DisplayFor(model => model.ProductName)</h4>
+                    <p class="card-text"> @Html.DisplayFor(model => model.ShortDescription)</p>
+                    <p class="card-text"> @Html.DisplayFor(model => model.LongDescription)</p>
+                    <p class="card-text"> @Html.DisplayFor(model => model.Specification)</p>
+                </div>
+                <div class="card-footer">
+                    <span class="price" style="color:red;font-size:large"><b>@string.Format("{0:C}", Model.Price)</b></span>
+                </div>
+                <div>
+                    <br />
+                </div>
+                <div>
+                    @using (Html.BeginForm("SendEmail", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <div class="container">
+                            <span class="form-control-static"> Email To: </span>
+                            <input class="form-control" type="text" name="emailTo" /><br />
+                            <div class="card-title hidden">@Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })</div>
+                            <div class="card-text hidden"> @Html.EditorFor(model => model.ShortDescription, new { htmlAttributes = new { @class = "form-control" } })</div>
+                            <div class="card-text hidden">@Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })</div>
+                            <input class="btn btn-primary" style="background-color:#e91b23" type="submit" value="Send Email" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
